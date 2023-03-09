@@ -974,7 +974,7 @@ class DeepSpeedEngine(Module):
             local_rank = self.local_rank
         if local_rank >= 0:
             get_accelerator().set_device(device)
-            self.device = torch.device(get_accelerator().device_name())
+            self.device = torch.device(get_accelerator().current_device_name())
             self.world_size = dist.get_world_size()
             self.global_rank = dist.get_rank()
         else:

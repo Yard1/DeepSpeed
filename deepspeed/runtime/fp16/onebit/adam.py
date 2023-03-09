@@ -215,7 +215,7 @@ class OnebitAdam(torch.optim.Optimizer):
                                     exp_avg,
                                     state['worker_error'],
                                     state['server_error'],
-                                    self.deepspeed.local_rank))
+                                    self.deepspeed.device_index))
                         # Because 1-bit compression cannot represent exact zero, it is required to
                         # provide a momentum mask for those params that have constant exact zeros in their
                         # momentums, otherwise the compression error would keep accumulating.

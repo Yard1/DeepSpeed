@@ -19,7 +19,11 @@ class DeepSpeedAccelerator(ABC):
         ...
 
     @abc.abstractmethod
-    def set_device(self, device_index):
+    def get_default_device_from_env(self):
+        ...
+
+    @abc.abstractmethod
+    def set_device(self, device_index=None):
         ...
 
     @abc.abstractmethod

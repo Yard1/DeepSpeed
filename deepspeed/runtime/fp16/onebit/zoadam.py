@@ -216,7 +216,7 @@ class ZeroOneAdam(torch.optim.Optimizer):
                                         grad,
                                         state['worker_error'],
                                         state['server_error'],
-                                        self.deepspeed.local_rank)
+                                        self.deepspeed.device_index)
                                     if 'exp_avg_mask' in group:
                                         if grad_onebit.device != group[
                                                 'exp_avg_mask'].device:
@@ -237,7 +237,7 @@ class ZeroOneAdam(torch.optim.Optimizer):
                                 comm_buffer,
                                 state['worker_error'],
                                 state['server_error'],
-                                self.deepspeed.local_rank))
+                                self.deepspeed.device_index))
                         if 'exp_avg_mask' in group:
                             if comm_buffer.device != group['exp_avg_mask'].device:
                                 group['exp_avg_mask'] = group['exp_avg_mask'].to(
@@ -263,7 +263,7 @@ class ZeroOneAdam(torch.optim.Optimizer):
                                         comm_buffer,
                                         state['worker_error'],
                                         state['server_error'],
-                                        self.deepspeed.local_rank))
+                                        self.deepspeed.device_index))
                                 if 'exp_avg_mask' in group:
                                     if comm_buffer.device != group['exp_avg_mask'].device:
                                         group['exp_avg_mask'] = group['exp_avg_mask'].to(

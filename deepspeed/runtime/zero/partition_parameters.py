@@ -192,8 +192,7 @@ def zero_wrapper_for_fp_tensor_constructor(fn: Callable,
                                            target_fp_dtype: torch.dtype) -> Callable:
     def wrapped_fn(*args, **kwargs) -> Tensor:
         if kwargs.get("device", None) is None:
-            kwargs['device'] = torch.device(get_accelerator().device_name(
-                os.environ["LOCAL_RANK"]))
+            kwargs['device'] = get_accelerator().get_default_device_from_env()
         tensor: Tensor = fn(*args, **kwargs)
         if tensor.is_floating_point():
             tensor = tensor.to(target_fp_dtype)
@@ -205,7 +204,7 @@ def zero_wrapper_for_fp_tensor_constructor(fn: Callable,
 
 def get_new_tensor_fn_for_dtype(dtype: torch.dtype) -> Callable:
     def new_tensor(cls, *args) -> Tensor:
-        device = torch.device(get_accelerator().device_name(os.environ["LOCAL_RANK"]))
+        device = get_accelerator().get_default_device_from_env()
         tensor = _orig_torch_empty(0, device=device).new_empty(*args)
         if tensor.is_floating_point():
             tensor = tensor.to(dtype)
@@ -674,8 +673,7 @@ class Init(InsertPostInitMethodToModuleSubClasses):
 
         # Local device is the device where the parameters are consumed, must be default device.
         # It is the device where parameters are fully instantiated using allgather
-        self.local_device = torch.device(get_accelerator().device_name(
-            os.environ["LOCAL_RANK"]))
+        self.local_device = get_accelerator().get_default_device_from_env()
         get_accelerator().set_device(self.local_device)
 
         if _ds_config is not None and _ds_config.zero_config.offload_param is not None:

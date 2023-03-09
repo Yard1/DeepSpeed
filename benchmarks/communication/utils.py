@@ -14,8 +14,7 @@ def init_torch_distributed(backend):
     global dist
     import torch.distributed as dist
     torch.distributed.init_process_group(backend)
-    local_rank = int(os.environ['LOCAL_RANK'])
-    get_accelerator().set_device(local_rank)
+    get_accelerator().set_device()
 
 
 def init_deepspeed_comm(backend):
@@ -23,8 +22,7 @@ def init_deepspeed_comm(backend):
     import deepspeed
     import deepspeed.comm as dist
     deepspeed.init_distributed(dist_backend=backend)
-    local_rank = int(os.environ['LOCAL_RANK'])
-    get_accelerator().set_device(local_rank)
+    get_accelerator().set_device()
 
 
 def init_processes(local_rank, args):

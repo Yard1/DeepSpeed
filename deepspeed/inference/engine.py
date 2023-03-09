@@ -202,8 +202,7 @@ class InferenceEngine(Module):
         # Call the init process
         if InferenceEngine.inference_mp_group is None:
             init_distributed()
-            local_rank = int(os.getenv('LOCAL_RANK', '0'))
-            get_accelerator().set_device(local_rank)
+            get_accelerator().set_device()
 
             ranks = [i for i in range(config.tensor_parallel.tp_size)]
             self.mp_group = dist.new_group(ranks)

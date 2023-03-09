@@ -162,8 +162,10 @@ class PipelineModule(nn.Module):
         self.world_group = dist.new_group(ranks=range(dist.get_world_size()))
         self.global_rank = dist.get_rank(group=self.world_group)
         self.world_size = dist.get_world_size(group=self.world_group)
-        self.local_rank = int(os.environ.get("LOCAL_RANK", None))
+        self.local_rank = os.environ.get("LOCAL_RANK", None)
         assert self.local_rank != None
+        self.local_rank =  int(self.local_rank)
+        device = get_accelerator().get_default_device_from_env()
 
         if topology:
             self._topo = topology
@@ -203,7 +205,7 @@ class PipelineModule(nn.Module):
 
         #with torch.random.fork_rng(devices=[get_accelerator().current_device_name()]):
         self._build()
-        self.to(get_accelerator().device_name(self.local_rank))
+        self.to(device)
 
         self.tied_comms = self._index_tied_modules()
         self._synchronize_tied_weights()

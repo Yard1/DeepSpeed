@@ -313,7 +313,7 @@ class OnebitLamb(torch.optim.Optimizer):
                             self.exp_avg_flat[i],
                             self.worker_errors[0],
                             self.server_errors[0],
-                            self.deepspeed.local_rank)
+                            self.deepspeed.device_index)
 
                         if dist.get_rank() == 0:
                             print('Pop out errors', flush=True)
@@ -324,7 +324,7 @@ class OnebitLamb(torch.optim.Optimizer):
                             self.exp_avg_flat[i],
                             self.worker_errors[i],
                             self.server_errors[i],
-                            self.deepspeed.local_rank)
+                            self.deepspeed.device_index)
 
         if self.lamb_freeze_key and self.initialize:
             for i, group in enumerate(self.param_groups):

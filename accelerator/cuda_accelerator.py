@@ -47,8 +47,12 @@ class CUDA_Accelerator(DeepSpeedAccelerator):
         return torch.cuda.device(device_index)
 
     def get_default_device_from_env(self):
-        local_rank = int(os.environ['LOCAL_RANK'])
-        device = torch.device(os.environ.get("DEEPSPEED_DEVICE", self.device_name(local_rank)))
+        if "LOCAL_RANK" in os.environ:
+            local_rank = int(os.environ['LOCAL_RANK'])
+            local_rank_device = self.device_name(local_rank)
+        else:
+            local_rank_device = self.device_name()
+        device = torch.device(os.environ.get("DEEPSPEED_DEVICE", local_rank_device))
         return device
 
     def set_device(self, device_index=None):

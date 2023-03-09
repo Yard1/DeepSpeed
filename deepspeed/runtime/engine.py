@@ -967,14 +967,13 @@ class DeepSpeedEngine(Module):
     def _set_distributed_vars(self, args):
         if args is not None and hasattr(args, 'device_rank'):
             # If we have device_rank arg, let's use that
-            device_rank = args.device_rank
-        elif "DEEPSPEED_DEVICE" in os.environ:
-            # Otherwise, use default
-            device_rank = os.environ["DEEPSPEED_DEVICE"]
+            device = args.device_rank
+            local_rank = device
         else:
-            device_rank = self.local_rank
-        if self.local_rank >= 0:
-            get_accelerator().set_device(device_rank)
+            device = get_accelerator().get_default_device_from_env()
+            local_rank = self.local_rank
+        if local_rank >= 0:
+            get_accelerator().set_device(device)
             self.device = torch.device(get_accelerator().device_name())
             self.world_size = dist.get_world_size()
             self.global_rank = dist.get_rank()

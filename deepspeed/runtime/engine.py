@@ -970,22 +970,22 @@ class DeepSpeedEngine(Module):
             device_rank = args.device_rank
         elif "DEEPSPEED_DEVICE" in os.environ:
             # Otherwise, use default
-            device_rank = get_accelerator().device(os.environ["DEEPSPEED_DEVICE"]).index
+            device_rank = os.environ["DEEPSPEED_DEVICE"]
         else:
             device_rank = self.local_rank
-        if device_rank >= 0:
+        if self.local_rank >= 0:
             get_accelerator().set_device(device_rank)
-            self.device = get_accelerator().current_device()
+            self.device = torch.device(get_accelerator().device_name())
             self.world_size = dist.get_world_size()
             self.global_rank = dist.get_rank()
         else:
             self.world_size = 1
             self.global_rank = 0
-            self.device = get_accelerator().device(get_accelerator().device_name())
+            self.device = torch.device(get_accelerator().device_name())
 
     @property
     def device_index(self) -> int:
-        return self.device.index
+        return get_accelerator().current_device()
 
     # Configure based on command line arguments
     def _configure_with_arguments(self, args, mpu):

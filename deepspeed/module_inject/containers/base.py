@@ -60,7 +60,7 @@ class BaseTransformerContainer(ABC):
         self.scale_attn_by_inverse_layer_idx = getattr(self.config, "scale_attn_by_inverse_layer_idx", False)
         self.use_mup = self.policy.use_mup
         self.return_single_tuple = False
-        self.rotary_dim = self.get_rotary_dim()
+        self.rotary_dim = self.get_rotary_dim(policy)
         self.mlp_after_attn = (self.rotary_dim is None or self.rotary_dim < 0)
 
         # Attention tensors
@@ -141,11 +141,15 @@ class BaseTransformerContainer(ABC):
                 if isinstance(v, torch.Tensor) or isinstance(v, torch.nn.Parameter):
                     self.__dict__[k] = v.to(self.dtype)
 
-    def get_rotary_dim(self):
+    def get_rotary_dim(self, policy=None):
+
+        from .falcon import FALCONLayerPolicy
         if hasattr(self.model_config, 'rotary_dim'):
             return self.model_config.rotary_dim
         if hasattr(self.child, 'attention') and hasattr(self.child.attention, 'rotary_ndims'):
             return self.child.attention.rotary_ndims
+        if policy.__class__ is FALCONLayerPolicy:
+            return self.child.self_attention.head_dim
         return -1
 
     def set_moe(self, moe=False):
